@@ -41,7 +41,15 @@ jobs:
         run: terraform validate
         working-directory: environments/dev
 
-      - name: Terraform Plan
+      - name: Terraform apply for vpc
+        run: terraform apply -target=module.vpc -auto-approve
+        working-directory: environments/dev
+
+      - name: Terraform apply for security groups
+        run: terraform apply -target=module.security_groups -auto-approve
+        working-directory: environments/dev
+
+      - name: Terraform Plan (remaining resourcs)
         run: terraform plan -input=false -out=tfplan
         working-directory: environments/dev
 
