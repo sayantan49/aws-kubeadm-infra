@@ -31,7 +31,7 @@ jobs:
         working-directory: environments/dev
 
       - name: Terraform Plan VPC
-        run: terraform plan -target=module.vpc -auto-approve
+        run: terraform plan
         working-directory: environments/dev
 
       - name: Terraform Apply VPC
