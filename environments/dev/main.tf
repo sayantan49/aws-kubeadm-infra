@@ -1,27 +1,15 @@
-provider "aws" {
-  region      = "eu-north-1"
-  retry_mode  = "adaptive"
-  max_retries = 5
-}
-
-resource "aws_dynamodb_table" "terraform_locks" {
-  name         = "terraform-lock"
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "LockID"
-
-  attribute {
-    name = "LockID"
-    type = "S"
-  }
-
-  lifecycle {
-    prevent_destroy = true
+terraform {
+  backend "s3" {
+    bucket  = "terraform-state-sayantan"
+    key     = "terraform.tfstate"
+    region  = "eu-north-1"
+    encrypt = true
   }
 }
 
 module "vpc" {
-  source = "../../modules/vpc"
-  vpc_cidr  = "10.0.0.0/16"
+  source   = "../../modules/vpc"
+  vpc_cidr = "10.0.0.0/16"
 }
 
 module "security_groups" {
@@ -31,9 +19,7 @@ module "security_groups" {
 }
 
 module "ec2" {
-  source       = "../../modules/ec2"
-  vpc_id       = module.vpc.vpc_id
-  master_sg_id = module.security_groups.master_sg_id
-  worker_sg_id = module.security_groups.worker_sg_id
-  depends_on   = [module.vpc, module.security_groups]
+  source            = "../../modules/ec2"
+  security_group_id = module.security_groups.k8s_master_id
+  depends_on        = [module.security_groups]
 }

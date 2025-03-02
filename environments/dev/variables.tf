@@ -6,6 +6,6 @@ variable "aws_region" {
 }
 
 #variable "vpc_id" {
- # type = string
+# type = string
 #}
 

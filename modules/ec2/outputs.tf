@@ -1,8 +1,3 @@
-output "master_public_ip" {
-  value = aws_instance.master.id
+output "instance_id" {
+  value = aws_instance.ec2_instance.id
 }
-
-output "worker_public_ip" {
-  value = aws_instance.worker[*].id
-}
-

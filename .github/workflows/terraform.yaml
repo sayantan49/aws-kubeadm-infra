@@ -3,93 +3,40 @@ name: Terraform Deployment
 on:
   push:
     branches:
-      - main  # Run on main branch changes
-  workflow_dispatch:  # Allows manual trigger
+      - main
 
 jobs:
   terraform:
-    name: "Terraform Apply"
     runs-on: ubuntu-latest
-
+    env:
+      AWS_REGION: eu-north-1
     steps:
-      - name: "Checkout Repository"
-        uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-      # ✅ Configure AWS Credentials (Secure Authentication)
-      - name: "Authenticate with AWS"
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-north-1  # Change if needed
+          aws-region: eu-north-1
 
-      # ✅ Verify AWS Authentication
-      - name: "Verify AWS Authentication"
-        run: aws sts get-caller-identity
-
-      # ✅ Install Latest Terraform Version
-      - name: "Install Terraform"
+      - name: Set Up Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: latest
 
-      # ✅ Initialize Terraform with Remote S3 Backend
-      - name: "Initialize Terraform"
-        run: |
-          export TF_IN_AUTOMATION=1
-          terraform init -input=false -reconfigure \
-            -backend-config="bucket=terraform-state-sayantan" \
-            -backend-config="key=terraform.tfstate" \
-            -backend-config="region=eu-north-1"
+      - name: Verify AWS Authentication
+        run: aws sts get-caller-identity
 
+      - name: Terraform Init
+        run: terraform init -input=false
         working-directory: environments/dev
 
-      # ✅ Run Terraform Plan (To Check What Will Be Created)
-      - name: "Terraform Plan"
-        run: |
-          export TF_IN_AUTOMATION=1
-          terraform plan -out=tfplan -input=false
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan -input=false
         working-directory: environments/dev
 
-      # ✅ Apply Terraform (Auto-Approve)
-      - name: "Terraform Apply"
-        run: |
-          export TF_IN_AUTOMATION=1
-          terraform apply -auto-approve -input=false tfplan
+      - name: Terraform Apply All
+        run: terraform apply -auto-approve -input=false tfplan
         working-directory: environments/dev
-
-      # ✅ Fetch & Store VPC ID (Automatically Captures Output)
-      - name: "Fetch VPC ID"
-        run: |
-          echo "Fetching VPC ID..."
-          VPC_ID=$(terraform output -raw vpc_id)
-          echo "VPC_ID=$VPC_ID" >> $GITHUB_ENV
-
-      # ✅ Fetch & Store Security Group ID
-      - name: "Fetch Security Group ID"
-        run: |
-          echo "Fetching Security Group ID..."
-          SG_ID=$(terraform output -raw security_group_id)
-          echo "SG_ID=$SG_ID" >> $GITHUB_ENV
-
-      # ✅ Fetch & Store EC2 Instance ID
-      - name: "Fetch EC2 Instance ID"
-        run: |
-          echo "Fetching EC2 Instance ID..."
-          EC2_ID=$(terraform output -raw ec2_instance_id)
-          echo "EC2_ID=$EC2_ID" >> $GITHUB_ENV
-
-      # ✅ Store All IDs in GitHub Environment
-      - name: "Store Outputs in GitHub Env"
-        run: |
-          echo "VPC_ID=${{ env.VPC_ID }}" >> $GITHUB_ENV
-          echo "SG_ID=${{ env.SG_ID }}" >> $GITHUB_ENV
-          echo "EC2_ID=${{ env.EC2_ID }}" >> $GITHUB_ENV
-
-      # ✅ Verify AWS Credentials Post Deployment
-      - name: "Post Configure AWS Credentials"
-        run: aws configure list
-
-      # ✅ Final Confirmation Step
-      - name: "Pipeline Completed"
-        run: echo "Terraform deployment finished successfully! ✅"
