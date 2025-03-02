@@ -7,5 +7,5 @@ variable "vpc_cidr" {
 variable "vpc_id" {
   description = "VPC ID (Will be created if not provided)"
   type        = string
-  default     = ""
+  default     = "0000000"
 }
