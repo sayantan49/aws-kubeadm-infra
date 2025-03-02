@@ -8,7 +8,7 @@ on:
       - "modules/vpc/**"
       - "environments/dev/main.tf"
 
-  workflow_dispatch:  # ✅ Allows manual triggering
+  workflow_dispatch:
 
 jobs:
   terraform-vpc:
@@ -50,11 +50,14 @@ jobs:
         working-directory: environments/dev
 
       - name: Fetch VPC ID  # ✅ Retrieves the created VPC ID dynamically
-        run: echo "VPC_ID=$(terraform output -raw vpc_id)" >> $GITHUB_ENV
+        run: |
+          echo "Fetching VPC ID..."
+          VPC_ID=$(terraform output -raw vpc_id)
+          echo "VPC_ID=$VPC_ID" >> $GITHUB_ENV
         working-directory: environments/dev
 
       - name: Terraform Output Check  # ✅ Debugging step to verify stored VPC ID
-        run: echo "$VPC_ID"
+        run: echo " $VPC_ID"
 
       - name: Terraform Apply Remaining Infrastructure  # ✅ Now apply the full infra
         run: terraform apply -auto-approve
