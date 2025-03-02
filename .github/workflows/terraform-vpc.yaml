@@ -48,7 +48,7 @@ jobs:
       - name: Initialize Terraform
         run: |
           export TF_IN_AUTOMATION=1
-          terraform init
+          terraform init -reconfigure
 
       - name: Terraform Plan VPC
         run: |
