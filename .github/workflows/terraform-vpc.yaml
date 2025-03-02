@@ -52,6 +52,7 @@ jobs:
             -backend-config="bucket=my-terraform-bucket" \
             -backend-config="key=terraform.tfstate" \
             -backend-config="region=eu-north-1"
+        working-directory: environments/dev
 
       - name: Terraform Plan VPC
         run: |
