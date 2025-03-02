@@ -71,6 +71,8 @@ jobs:
           echo "Fetching VPC ID..."
           VPC_ID=$(terraform output -raw vpc_id)
           echo "VPC_ID=$VPC_ID" >> $GITHUB_ENV
+        shell: bash
+        working-directory: environments/dev
 
       - name: Store VPC ID in GitHub Environment
         run: echo "VPC_ID=${{ env.VPC_ID }}" >> $GITHUB_ENV
