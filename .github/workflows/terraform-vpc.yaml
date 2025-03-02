@@ -22,15 +22,20 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Install AWS CLI  # ✅ Fix for missing awscli package
+      - name: Install or Update AWS CLI  # ✅ Fix for existing AWS CLI installation issue
         run: |
-          sudo apt update
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install
+          if ! command -v aws &> /dev/null; then
+            echo "AWS CLI not found, installing..."
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+          else
+            echo "AWS CLI is already installed, updating..."
+            sudo ./aws/install --update
+          fi
           aws --version
 
-      - name: Verify AWS Authentication  # ✅ Ensure credentials are set
+      - name: Verify AWS Authentication  # ✅ Ensure AWS credentials are valid
         run: aws sts get-caller-identity
 
       - name: Setup Terraform
@@ -40,10 +45,13 @@ jobs:
         run: terraform init
         working-directory: environments/dev
 
-      - name: Terraform Apply VPC
+      - name: Terraform Apply VPC  # ✅ Applies only the VPC module first
         run: terraform apply -target=module.vpc -auto-approve
         working-directory: environments/dev
 
-      - name: Store VPC ID in GitHub Environment
+      - name: Store VPC ID in GitHub Environment  # ✅ Saves VPC ID for later use
         run: echo "VPC_ID=$(terraform output -raw vpc_id)" >> $GITHUB_ENV
         working-directory: environments/dev
+
+     # - name: Terraform Output Check  # ✅ Debugging step to verify stored VPC ID
+       #// run: echo "VPC ID: $VPC_ID"
