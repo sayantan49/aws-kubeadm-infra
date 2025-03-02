@@ -50,7 +50,7 @@ jobs:
           export TF_IN_AUTOMATION=1
           terraform init -input=false -reconfigure \
             -backend-config="bucket=my-terraform-bucket" \
-            -backend-config="key=terraform/state.tfstate" \
+            -backend-config="key=terraform.tfstate" \
             -backend-config="region=eu-north-1"
 
       - name: Terraform Plan VPC
