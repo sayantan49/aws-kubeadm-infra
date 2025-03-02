@@ -1,4 +1,4 @@
-resource "aws_instance" "" {
+resource "aws_instance" "master_node" {
   ami           = "ami-09a9858973b288bdd" # Change this to a valid AMI
   instance_type = "t3.medium"
   vpc_security_group_ids = [var.security_group_id]
