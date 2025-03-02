@@ -1,6 +1,8 @@
 provider "aws" {
 
   region = "eu-north-1"
+  retry_mode = "adaptive"
+  max_retries = 5
 
 }
 
