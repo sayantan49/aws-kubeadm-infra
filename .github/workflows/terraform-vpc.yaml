@@ -30,9 +30,9 @@ jobs:
         run: terraform init -reconfigure -backend-config="bucket=terraform-state-sayantan" -backend-config="key=terraform.tfstate" -backend-config="region=eu-north-1"
         working-directory: environments/dev
 
-      - name: Terraform Plan VPC
-        run: terraform plan
-        working-directory: environments/dev
+      #- name: Terraform Plan VPC
+     #   run: terraform plan
+      #  working-directory: environments/dev
 
       - name: Terraform Apply VPC
         run: terraform apply -target=module.vpc -auto-approve
