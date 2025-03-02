@@ -1,0 +1,36 @@
+name: Terraform EC2 Deployment
+
+on:
+  workflow_run:
+    workflows: ["Terraform Security Groups Deployment"]
+    types:
+      - completed
+
+jobs:
+  terraform-ec2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Fetch VPC ID from S3
+        run: export VPC_ID=$(aws s3 cp s3://your-terraform-state-bucket/vpc_id.txt -)
+
+      - name: Fetch Security Group IDs from Terraform Output
+        run: |
+          export MASTER_SG_ID=$(terraform output -raw master_sg_id)
+          export WORKER_SG_ID=$(terraform output -raw worker_sg_id)
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: environments/dev
+
+      - name: Terraform Apply EC2
+        run: terraform apply -target=module.ec2 -auto-approve \
+          -var="vpc_id=$VPC_ID" \
+          -var="master_sg_id=$MASTER_SG_ID" \
+          -var="worker_sg_id=$WORKER_SG_ID"
+        working-directory: environments/dev
