@@ -6,6 +6,8 @@ on:
     types:
       - completed
 
+  workflow_dispatch:
+
 jobs:
   terraform-security-groups:
     runs-on: ubuntu-latest
@@ -25,4 +27,10 @@ jobs:
 
       - name: Terraform Apply Security Groups
         run: terraform apply -target=module.security_groups -auto-approve -var="vpc_id=$VPC_ID"
+        working-directory: environments/dev
+
+      - name: Fetch Security Group IDs
+        run: |
+          echo "MASTER_SG_ID=$(terraform output -raw master_sg_id)" >> $GITHUB_ENV
+          echo "WORKER_SG_ID=$(terraform output -raw worker_sg_id)" >> $GITHUB_ENV
         working-directory: environments/dev

@@ -8,6 +8,8 @@ on:
       - "modules/vpc/**"
       - "environments/dev/main.tf"
 
+  workflow_dispatch:
+
 jobs:
   terraform-vpc:
     runs-on: ubuntu-latest
@@ -26,9 +28,9 @@ jobs:
         run: terraform apply -target=module.vpc -auto-approve
         working-directory: environments/dev
 
-      - name: Store VPC ID in GitHub Environments
+      - name: Fetch VPC ID
         run: echo "VPC_ID=$(terraform output -raw vpc_id)" >> $GITHUB_ENV
         working-directory: environments/dev
 
-      - name: Save VPC ID in S3 (Optional)
+      - name: Store VPC ID in S3 (Optional)
         run: aws s3 cp <(echo "$VPC_ID") s3://your-terraform-state-bucket/vpc_id.txt

@@ -6,6 +6,8 @@ on:
     types:
       - completed
 
+  workflow_dispatch:
+
 jobs:
   terraform-ec2:
     runs-on: ubuntu-latest
@@ -19,7 +21,7 @@ jobs:
       - name: Fetch VPC ID from S3
         run: export VPC_ID=$(aws s3 cp s3://your-terraform-state-bucket/vpc_id.txt -)
 
-      - name: Fetch Security Group IDs from Terraform Output
+      - name: Fetch Security Group IDs
         run: |
           export MASTER_SG_ID=$(terraform output -raw master_sg_id)
           export WORKER_SG_ID=$(terraform output -raw worker_sg_id)
