@@ -42,17 +42,21 @@ jobs:
             -backend-config="key=terraform.tfstate" \
             -backend-config="region=eu-north-1"
 
+        working-directory: environments/dev
+
       # ✅ Run Terraform Plan (To Check What Will Be Created)
       - name: "Terraform Plan"
         run: |
           export TF_IN_AUTOMATION=1
           terraform plan -out=tfplan -input=false
+        working-directory: environments/dev
 
       # ✅ Apply Terraform (Auto-Approve)
       - name: "Terraform Apply"
         run: |
           export TF_IN_AUTOMATION=1
           terraform apply -auto-approve -input=false tfplan
+        working-directory: environments/dev
 
       # ✅ Fetch & Store VPC ID (Automatically Captures Output)
       - name: "Fetch VPC ID"
