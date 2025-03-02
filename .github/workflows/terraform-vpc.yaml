@@ -22,7 +22,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Remove Old AWS CLI & Install Latest Version  # ✅ Corrected installation process
+      - name: Install or Update AWS CLI
         run: |
           if command -v aws &> /dev/null; then
             echo "Removing existing AWS CLI..."
@@ -35,7 +35,7 @@ jobs:
           sudo ./aws/install
           aws --version
 
-      - name: Verify AWS Authentication  # ✅ Ensure AWS credentials are valid
+      - name: Verify AWS Authentication
         run: aws sts get-caller-identity
 
       - name: Setup Terraform
@@ -49,9 +49,13 @@ jobs:
         run: terraform apply -target=module.vpc -auto-approve
         working-directory: environments/dev
 
-      - name: Store VPC ID in GitHub Environment  # ✅ Saves VPC ID for later use
+      - name: Fetch VPC ID  # ✅ Retrieves the created VPC ID dynamically
         run: echo "VPC_ID=$(terraform output -raw vpc_id)" >> $GITHUB_ENV
         working-directory: environments/dev
 
-      #- name: Terraform Output Check  # ✅ Debugging step to verify stored VPC ID
-       # run: echo "VPC ID: $VPC_ID"
+      - name: Terraform Output Check  # ✅ Debugging step to verify stored VPC ID
+        run: echo "$VPC_ID"
+
+      - name: Terraform Apply Remaining Infrastructure  # ✅ Now apply the full infra
+        run: terraform apply -auto-approve
+        working-directory: environments/dev
