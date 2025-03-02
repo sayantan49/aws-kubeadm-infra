@@ -22,7 +22,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Install or Update AWS CLI  # ✅ Fix for existing AWS CLI installation issue
+      - name: Install or Update AWS CLI  # ✅ Fix for AWS CLI installation issue
         run: |
           if ! command -v aws &> /dev/null; then
             echo "AWS CLI not found, installing..."
@@ -31,7 +31,7 @@ jobs:
             sudo ./aws/install
           else
             echo "AWS CLI is already installed, updating..."
-            sudo ./aws/install --update
+            sudo aws --update
           fi
           aws --version
 
@@ -53,5 +53,5 @@ jobs:
         run: echo "VPC_ID=$(terraform output -raw vpc_id)" >> $GITHUB_ENV
         working-directory: environments/dev
 
-     # - name: Terraform Output Check  # ✅ Debugging step to verify stored VPC ID
-       #// run: echo "VPC ID: $VPC_ID"
+      #- name: Terraform Output Check  # ✅ Debugging step to verify stored VPC ID
+       # run: echo "VPC ID: $VPC_ID"
