@@ -5,9 +5,9 @@ provider "aws" {
 }
 
 resource "aws_dynamodb_table" "terraform_locks" {
-  name = "terraform-lock"
+  name         = "terraform-lock"
   billing_mode = "PAY_PER_REQUEST"
-  hash_key = "LockID"
+  hash_key     = "LockID"
 
   attribute {
     name = "LockID"
@@ -30,9 +30,9 @@ module "security_groups" {
 
 
 module "ec2" {
-  source        = "../../modules/ec2"
-  vpc_id        = module.vpc.vpc_id
-  master_sg_id  = module.security_groups.master_sg_id
-  worker_sg_id  = module.security_groups.worker_sg_id
+  source       = "../../modules/ec2"
+  vpc_id       = module.vpc.vpc_id
+  master_sg_id = module.security_groups.master_sg_id
+  worker_sg_id = module.security_groups.worker_sg_id
 }
 

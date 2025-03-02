@@ -1,7 +1,7 @@
 variable "instance_type" {
   description = "Instance type for kubernetes nodes"
-  type= string
-  default = "t3.medium"
+  type        = string
+  default     = "t3.medium"
 
 }
 
