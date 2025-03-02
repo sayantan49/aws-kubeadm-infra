@@ -54,11 +54,13 @@ jobs:
         run: |
           export TF_IN_AUTOMATION=1
           terraform plan -target=module.vpc -out=tfplan -input=false
+        working-directory: environments/dev
 
       - name: Terraform Apply VPC
         run: |
           export TF_IN_AUTOMATION=1
           echo "yes" | terraform apply -target=module.vpc -auto-approve -input=false || true
+        working-directory: environments/dev
 
       - name: Fetch VPC ID
         run: |
