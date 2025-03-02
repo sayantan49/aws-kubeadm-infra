@@ -5,7 +5,7 @@ variable "aws_region" {
   default     = "eu-north-1"
 }
 
-variable "vpc_id" {
-  type = string
-}
+#variable "vpc_id" {
+ # type = string
+#}
 
