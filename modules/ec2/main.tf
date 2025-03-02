@@ -15,6 +15,7 @@ resource "aws_instance" "worker" {
   instance_type = "t3.medium"
   vpc_security_group_ids = [var.worker_sg_id]
   tags = {
-    Name =  "k8s-worker-${count.index}"
+    Name = "k8s-worker-${count.index}"
+  }
 
 }
