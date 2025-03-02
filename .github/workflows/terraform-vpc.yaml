@@ -31,11 +31,11 @@ jobs:
         working-directory: environments/dev
 
       - name: Terraform Plan VPC
-        run: terraform plan -target=module.vpc -out=tfplan
+        run: terraform plan -target=module.vpc
         working-directory: environments/dev
 
       - name: Terraform Apply VPC
-        run: terraform apply -target=module.vpc -auto-approve -input=false -var "vpc_id=vpc-00000000"
+        run: terraform apply -target=module.vpc -auto-approve
         working-directory: environments/dev
 
       - name: Fetch VPC ID
