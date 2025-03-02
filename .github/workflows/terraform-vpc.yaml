@@ -8,7 +8,7 @@ on:
       - "modules/vpc/**"
       - "environments/dev/main.tf"
 
-  workflow_dispatch:
+  workflow_dispatch:  # ✅ Allows manual triggering
 
 jobs:
   terraform-vpc:
@@ -22,10 +22,28 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Setup AWS CLI
+      - name: Install AWS CLI  # ✅ Fix for missing awscli package
         run: |
-          sudo apt-get update && sudo apt-get install -y awscli
+          sudo apt update
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+          aws --version
 
-      - name: Verify AWS Authentication
-        run: |
-          aws sts get-caller-identity
+      - name: Verify AWS Authentication  # ✅ Ensure credentials are set
+        run: aws sts get-caller-identity
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: environments/dev
+
+      - name: Terraform Apply VPC
+        run: terraform apply -target=module.vpc -auto-approve
+        working-directory: environments/dev
+
+      - name: Store VPC ID in GitHub Environment
+        run: echo "VPC_ID=$(terraform output -raw vpc_id)" >> $GITHUB_ENV
+        working-directory: environments/dev
