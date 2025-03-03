@@ -2,10 +2,14 @@ output "vpc_id" {
   value = module.vpc.vpc_id
 }
 
-#utput "master_public_ip" {
-#  value = module.ec2.master_public_ip
-#}
+output "subnet_ids" {
+  value = module.vpc.subnet_ids
+}
 
-#output "worker_public_ips" {
- # value = module.ec2.worker_public_ip
-#}
+output "security_group_id" {
+  value = module.security_groups.sg_id
+}
+
+output "ec2_public_ips" {
+  value = module.ec2.ec2_public_ips
+}

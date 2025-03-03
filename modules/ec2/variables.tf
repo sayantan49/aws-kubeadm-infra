@@ -1,4 +1,5 @@
-variable "security_group_id" {
-  description = "Security group for EC2"
-  type        = string
+variable "instance_type" {
 }
+variable "ami_id" {}
+variable "subnet_ids" {}
+variable "security_group_ids" {}

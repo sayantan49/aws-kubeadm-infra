@@ -1,15 +1,14 @@
 terraform {
-  backend "s3" {
-    bucket  = "terraform-state-sayantan"
-    key     = "terraform.tfstate"
-    region  = "eu-north-1"
-    encrypt = true
-  }
+  #backend "s3" {
+  # bucket         = "terraform-state-sayantan"
+  #key            = "terraform.tfstate"
+  #region         = "eu-north-1"
+  #}
 }
 
 module "vpc" {
   source   = "../../modules/vpc"
-  vpc_cidr = "10.0.0.0/16"
+  vpc_cidr = var.vpc_cidr
 }
 
 module "security_groups" {
@@ -19,7 +18,10 @@ module "security_groups" {
 }
 
 module "ec2" {
-  source            = "../../modules/ec2"
-  security_group_id = module.security_groups.k8s_master_id
-  depends_on        = [module.security_groups]
+  source             = "../../modules/ec2"
+  instance_type      = var.instance_type
+  ami_id             = var.ami_id
+  subnet_ids         = module.vpc.subnet_ids
+  security_group_ids = [module.security_groups.sg_id]
+  depends_on         = [module.vpc, module.security_groups]
 }

@@ -1,11 +1,9 @@
 resource "aws_instance" "ec2_instance" {
-  ami           = "ami-09a9858973b288bdd" # Change this to a valid AMI
-  instance_type = "t3.medium"
-  vpc_security_group_ids = [var.security_group_id]
+  count         = 1
+  ami           = var.ami_id
+  instance_type = var.instance_type
+  subnet_id     = element(var.subnet_ids, 0)
+  vpc_security_group_ids = var.security_group_ids
 
-  depends_on = [var.security_group_id]  # Ensures Security Group is created first
-
-  tags = {
-    Name = "k8s-ec2"
-  }
+  tags = { Name = "k8s-master-node" }
 }
