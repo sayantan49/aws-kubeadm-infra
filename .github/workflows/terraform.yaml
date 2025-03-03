@@ -25,6 +25,10 @@ jobs:
       - name: AWS Authentication
         run: aws sts get-caller-identity
 
+      - name: Change directory to environments/dev
+        run: cd environments/dev
+
+
       - name: Initialize Terraform
         run: terraform init
 
