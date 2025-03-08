@@ -47,43 +47,9 @@ jobs:
         run: terraform apply -auto-approve
         working-directory: environments/dev
 
-      - name: Install JQ
-        run: sudo apt-get update && sudo apt-get install -y jq
-
       - name: Fetch Terraform Outputs
         run: |
-          echo "Fetching Terraform Outputs..."
-          echo "VPC_ID=$(terraform output -raw vpc_id)" >> $GITHUB_ENV
-          echo "SUBNET_IDS=$(terraform output -json subnet_ids | jq -r 'join(",")')" >> $GITHUB_ENV
-          echo "S3_BUCKET=$(terraform output -raw s3_bucket_name)" >> $GITHUB_ENV
+          terraform output -json > /tmp/tf_outputs.json
+          cat /tmp/tf_outputs.json
         working-directory: environments/dev
 
-
-
-      - name: Install Kops
-        run: |
-          curl -Lo kops https://github.com/kubernetes/kops/releases/latest/download/kops-linux-amd64
-          chmod +x kops
-          sudo mv kops /usr/local/bin/
-          kops version
-
-      - name: Create Kubernetes Cluster with Kops
-        run: |
-          export KOPS_STATE_STORE=s3://$S3_BUCKET
-          kops create cluster --name=k8s-cluster.k8s.local \
-            --state=$KOPS_STATE_STORE \
-            --vpc=$VPC_ID \
-            --subnets=$SUBNET_IDS \
-            --zones=eu-north-1a,eu-north-1b \
-            --node-count=2 \
-            --node-size=t3.medium \
-            --master-size=t3.medium \
-            --dns-zone=k8s.local \
-            --ssh-public-key=~/.ssh/id_rsa.pub
-
-      - name: Apply Kops Cluster
-        run: |
-          kops update cluster k8s-cluster.k8s.local --yes --state=s3://$S3_BUCKET
-
-      - name: Validate Kubernetes Cluster
-        run: kops validate cluster --state=s3://$S3_BUCKET
