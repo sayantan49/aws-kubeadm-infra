@@ -1,0 +1,10 @@
+- hosts: master
+  become: true
+  tasks:
+    - name: Install Kops
+      shell: |
+        curl -Lo kops https://github.com/kubernetes/kops/releases/latest/download/kops-linux-amd64
+        chmod +x kops
+        sudo mv kops /usr/local/bin/
+    - name: Verify Kops Installation
+      shell: kops version

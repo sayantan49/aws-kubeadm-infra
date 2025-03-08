@@ -40,3 +40,44 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false tfplan
         working-directory: environments/dev
+
+      #- name: Fetch EC2 Public IPs
+       # run: |
+        #    echo "Fetching EC2 Public IPs..."
+         #   echo "MASTER_IP=$(terraform output -raw master_public_ip)" >> $GITHUB_ENV
+           # echo "WORKER1_IP=$(terraform output -raw worker_public_ips | jq -r '.[0]')" >> $GITHUB_ENV
+          #  echo "WORKER2_IP=$(terraform output -raw worker_public_ips | jq -r '.[1]')" >> $GITHUB_ENV
+        #  working-directory: environments/dev
+
+      - name: Fetch Outputs
+        run: |
+          echo "S3_BUCKET=$(terraform output -raw s3_bucket_name)" >> $GITHUB_ENV
+          echo "VPC_ID=$(terraform output -raw vpc_id)" >> $GITHUB_ENV
+          echo "SUBNET_IDS=$(terraform output -raw subnet_ids)" >> $GITHUB_ENV
+        working-directory: environments/dev
+
+
+  ansible:
+    needs: terraform
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up Ansible
+        run: sudo apt update && sudo apt install -y ansible
+
+      - name: Generate Ansible Inventory
+        run: |
+          echo "[master]" > ansible/inventory.ini
+          echo "master ansible_host=$MASTER_IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa" >> ansible/inventory.ini
+          echo "[worker]" >> ansible/inventory.ini
+          echo "worker1 ansible_host=$WORKER1_IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa" >> ansible/inventory.ini
+          echo "worker2 ansible_host=$WORKER2_IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa" >> ansible/inventory.ini
+
+      - name: Run Ansible Playbook to Install Kops
+        run: ansible-playbook ansible/playbooks/install-kops.yaml
+
+      - name: Run Ansible Playbook to Configure Kops Cluster
+        run: ansible-playbook ansible/playbooks/configure-cluster.yaml
+

@@ -1,0 +1,17 @@
+- hosts: master
+  become: true
+  tasks:
+    - name: Configure Kops Cluster
+      shell: |
+        export KOPS_STATE_STORE=s3://kops-cluster-state
+        kops create cluster --name=k8s-cluster.k8s.local \
+          --state=$KOPS_STATE_STORE \
+          --vpc=${VPC_ID} \
+          --subnets=${SUBNET_IDS} \
+          --zones=eu-north-1a,eu-north-1b \
+          --node-count=2 \
+          --node-size=t3.medium \
+          --master-size=t3.medium \
+          --dns-zone=k8s.local \
+          --ssh-public-key=~/.ssh/id_rsa.pub
+        kops update cluster k8s-cluster.k8s.local --yes

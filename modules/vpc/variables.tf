@@ -1,6 +1,11 @@
-variable "vpc_cidr" {}
-
-variable "azs" {
-  default = ["eu-north-1a", "eu-north-1b"]
+variable "vpc_cidr" {
+  description = "CIDR block for the VPC"
+  type        = string
+  default     = "10.0.0.0/16"
 }
 
+variable "subnet_cidrs" {
+  description = "List of CIDR blocks for subnets"
+  type        = list(string)
+  default     = ["10.0.1.0/24", "10.0.2.0/24"]
+}
