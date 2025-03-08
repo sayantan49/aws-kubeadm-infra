@@ -47,6 +47,9 @@ jobs:
         run: terraform apply -auto-approve
         working-directory: environments/dev
 
+      - name: Install JQ
+        run: sudo apt-get update && sudo apt-get install -y jq
+
       - name: Fetch Terraform Outputs
         run: |
           echo "Fetching Terraform Outputs..."
@@ -54,6 +57,7 @@ jobs:
           echo "SUBNET_IDS=$(terraform output -json subnet_ids | jq -r 'join(",")')" >> $GITHUB_ENV
           echo "S3_BUCKET=$(terraform output -raw s3_bucket_name)" >> $GITHUB_ENV
         working-directory: environments/dev
+
 
 
       - name: Install Kops
