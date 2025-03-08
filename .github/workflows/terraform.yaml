@@ -18,6 +18,21 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: latest
+
+      - name: AWS Authentication
+        run: aws sts get-caller-identity
+
+      - name: Change directory to environments/dev
+        run: cd environments/dev
+
+
       - name: Configure AWS Credentials
         run: |
           aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
