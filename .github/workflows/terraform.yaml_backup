@@ -1,0 +1,79 @@
+name: Terraform Deployment
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: eu-north-1
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: latest
+
+      - name: AWS Authentication
+        run: aws sts get-caller-identity
+
+      - name: Change directory to environments/dev
+        run: cd environments/dev
+
+
+      - name: Initialize Terraform
+        run: terraform init
+        working-directory: environments/dev
+
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan -input=false
+        working-directory: environments/dev
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -input=false tfplan
+        working-directory: environments/dev
+
+
+      - name: Fetch Terraform Outputs
+        run: |
+          echo "Fetching Terraform Outputs..."
+          terraform output -json > /tmp/tf_outputs.json
+        working-directory: environments/dev
+
+
+
+
+
+  ansible:
+    needs: terraform
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up Ansible
+        run: sudo apt update && sudo apt install -y ansible
+
+      - name: Generate Ansible Inventory
+        run: |
+          echo "[master]" > ansible/inventory.ini
+          echo "master ansible_host=$MASTER_IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa" >> ansible/inventory.ini
+          echo "[worker]" >> ansible/inventory.ini
+          echo "worker1 ansible_host=$WORKER1_IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa" >> ansible/inventory.ini
+          echo "worker2 ansible_host=$WORKER2_IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa" >> ansible/inventory.ini
+
+      - name: Run Ansible Playbook to Install Kops
+        run: ansible-playbook ansible/playbooks/install-kops.yaml
+
+      - name: Run Ansible Playbook to Configure Kops Cluster
+        run: ansible-playbook ansible/playbooks/configure-cluster.yaml
+
