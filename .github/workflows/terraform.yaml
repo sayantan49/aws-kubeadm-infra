@@ -42,19 +42,27 @@ jobs:
         working-directory: environments/dev
 
       #- name: Fetch EC2 Public IPs
-       # run: |
+       #run: |
         #    echo "Fetching EC2 Public IPs..."
          #   echo "MASTER_IP=$(terraform output -raw master_public_ip)" >> $GITHUB_ENV
            # echo "WORKER1_IP=$(terraform output -raw worker_public_ips | jq -r '.[0]')" >> $GITHUB_ENV
           #  echo "WORKER2_IP=$(terraform output -raw worker_public_ips | jq -r '.[1]')" >> $GITHUB_ENV
         #  working-directory: environments/dev
 
+      #- name: Fetch Outputs
+       # run: |
+        #  echo "S3_BUCKET=$(terraform output -raw s3_bucket_name)" >> $GITHUB_ENV
+         # echo "VPC_ID=$(terraform output -raw vpc_id)" >> $GITHUB_ENV
+          #echo "SUBNET_IDS=$(terraform output -raw subnet_ids)" >> $GITHUB_ENV
+        #working-directory: environments/dev
+
       - name: Fetch Outputs
         run: |
-          echo "S3_BUCKET=$(terraform output -raw s3_bucket_name)" >> $GITHUB_ENV
-          echo "VPC_ID=$(terraform output -raw vpc_id)" >> $GITHUB_ENV
-          echo "SUBNET_IDS=$(terraform output -raw subnet_ids)" >> $GITHUB_ENV
+          echo "Fetching S3 Bucket..."
+          S3_BUCKET=$(terraform output -raw s3_bucket_name | tr -d '\r')
+          echo "S3_BUCKET=$S3_BUCKET" >> $GITHUB_ENV
         working-directory: environments/dev
+
 
 
   ansible:
