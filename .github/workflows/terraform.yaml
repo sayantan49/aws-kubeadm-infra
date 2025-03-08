@@ -51,9 +51,10 @@ jobs:
         run: |
           echo "Fetching Terraform Outputs..."
           echo "VPC_ID=$(terraform output -raw vpc_id)" >> $GITHUB_ENV
-          echo "SUBNET_IDS=$(terraform output -json subnet_ids | jq -r '. | join(",")')" >> $GITHUB_ENV
+          echo "SUBNET_IDS=$(terraform output -json subnet_ids | jq -r 'join(",")')" >> $GITHUB_ENV
           echo "S3_BUCKET=$(terraform output -raw s3_bucket_name)" >> $GITHUB_ENV
         working-directory: environments/dev
+
 
       - name: Install Kops
         run: |
