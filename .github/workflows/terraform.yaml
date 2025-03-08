@@ -57,12 +57,32 @@ jobs:
           #echo "SUBNET_IDS=$(terraform output -raw subnet_ids)" >> $GITHUB_ENV
         #working-directory: environments/dev
 
+     # - name: Fetch Outputs
+      #  run: |
+       #   echo "Fetching S3 Bucket..."
+        #  S3_BUCKET=$(terraform output -raw s3_bucket_name | tr -d '\r')
+         # echo "S3_BUCKET=$S3_BUCKET" >> $GITHUB_ENV
+        #working-directory: environments/dev
+
       - name: Fetch Outputs
         run: |
-          echo "Fetching S3 Bucket..."
-          S3_BUCKET=$(terraform output -raw s3_bucket_name | tr -d '\r')
+          echo "Fetching Terraform Outputs..."
+
+          VPC_ID=$(terraform output -raw vpc_id | tr -d '\n')
+          echo "VPC_ID=$VPC_ID" >> $GITHUB_ENV
+
+          SUBNET_IDS=$(terraform output -json subnet_ids | jq -r '.[]' | tr '\n' ',')
+          echo "SUBNET_IDS=$SUBNET_IDS" >> $GITHUB_ENV
+
+          S3_BUCKET=$(terraform output -raw s3_bucket_name | tr -d '\n')
           echo "S3_BUCKET=$S3_BUCKET" >> $GITHUB_ENV
+
+          echo "Fetched Outputs:"
+          echo "VPC_ID: $VPC_ID"
+          echo "SUBNET_IDS: $SUBNET_IDS"
+          echo "S3_BUCKET: $S3_BUCKET"
         working-directory: environments/dev
+
 
 
 
