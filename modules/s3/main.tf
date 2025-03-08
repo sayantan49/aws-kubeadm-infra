@@ -1,5 +1,5 @@
-resource "aws_s3_bucket" "kops_state" {
-  bucket = "kops-cluster-state"
+resource "aws_s3_bucket" "kops_state_sayantan49" {
+  bucket = "kops-cluster-state-sayantan49"
   acl    = "private"
 
   versioning {
@@ -13,9 +13,9 @@ resource "aws_s3_bucket" "kops_state" {
 }
 
 output "bucket_name" {
-  value = aws_s3_bucket.kops_state.id
+  value = aws_s3_bucket.kops_state_sayantan49.id
 }
 
 output "kops_state_store" {
-  value = "s3://${aws_s3_bucket.kops_state.id}"
+  value = "s3://${aws_s3_bucket.kops_state_sayantan49.id}"
 }
