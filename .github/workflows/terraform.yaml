@@ -53,15 +53,9 @@ jobs:
         run: terraform apply -auto-approve
         working-directory: environments/dev
 
-      #- name: Fetch Terraform Outputs
-        #run: |
-         # terraform output -json > /tmp/tf_outputs.json
-         # cat /tmp/tf_outputs.json
-       # working-directory: environments/dev
-
       - name: Debug Terraform Output
         run: |
-           echo "Fetching Terraform Outputs..."
+          echo "Fetching Terraform Outputs..."
           terraform output -json
         working-directory: environments/dev
 
