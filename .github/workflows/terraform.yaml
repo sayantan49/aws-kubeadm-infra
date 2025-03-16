@@ -55,10 +55,11 @@ jobs:
 
       - name: Fetch Terraform Outputs (Without jq)
         run: |
-          echo "Fetching Terraform Outputs..."
-          echo "KOPS_STATE_STORE=$(terraform output -raw kops_state_store)" >> $GITHUB_ENV
-          echo "VPC_ID=$(terraform output -raw vpc_id)" >> $GITHUB_ENV
-          echo "SUBNET_IDS=$(terraform output -raw subnet_ids)" >> $GITHUB_ENV
+            echo "Fetching Terraform Outputs..."
+            echo "KOPS_STATE_STORE=$(terraform output -raw kops_state_store)" >> $GITHUB_ENV
+            echo "VPC_ID=$(terraform output -raw vpc_id)" >> $GITHUB_ENV
+            echo "SUBNET_IDS=$(terraform output -json subnet_ids | tr -d '[:space:]')" >> $GITHUB_ENV
+        working-directory: environments/dev
 
       - name: Debug Output Variables
         run: |
@@ -66,11 +67,10 @@ jobs:
           echo "VPC_ID: $VPC_ID"
           echo "SUBNET_IDS: $SUBNET_IDS"
 
-
       - name: Deploy Kops Cluster
-        run: sh /scripts/deploy_kops.sh
+        run: sh deploy_kops.sh
         working-directory: scripts/
 
       - name: Refresh Terraform State
-        run: terraform refresh
+        run: terraform apply -refresh-only -auto-approve
         working-directory: environments/dev
