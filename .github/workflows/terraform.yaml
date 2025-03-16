@@ -62,10 +62,23 @@ jobs:
       - name: Fetch Terraform Outputs (Without jq)
         run: |
           echo "Fetching Terraform Outputs..."
-          echo "KOPS_STATE_STORE=$(terraform output -raw kops_state_store)" >> $GITHUB_ENV
-          echo "VPC_ID=$(terraform output -raw vpc_id)" >> $GITHUB_ENV
-          echo "SUBNET_IDS=$(terraform output -json subnet_ids | tr -d '[]"\n' | sed 's/ /,/g')" >> $GITHUB_ENV
+          
+          KOPS_STATE_STORE=$(terraform output -raw kops_state_store 2>/dev/null || echo "NOT_FOUND")
+          VPC_ID=$(terraform output -raw vpc_id 2>/dev/null || echo "NOT_FOUND")
+          SUBNET_IDS=$(terraform output -json subnet_ids | tr -d '[]"\n' | sed 's/ /,/g' 2>/dev/null || echo "NOT_FOUND")
+          
+          # Ensure we don't write empty values
+          if [[ "$KOPS_STATE_STORE" != "NOT_FOUND" ]]; then echo "KOPS_STATE_STORE=$KOPS_STATE_STORE" >> $GITHUB_ENV; fi
+          if [[ "$VPC_ID" != "NOT_FOUND" ]]; then echo "VPC_ID=$VPC_ID" >> $GITHUB_ENV; fi
+          if [[ "$SUBNET_IDS" != "NOT_FOUND" ]]; then echo "SUBNET_IDS=$SUBNET_IDS" >> $GITHUB_ENV; fi
+          
+          echo "✅ Extracted Outputs:"
+          echo "KOPS_STATE_STORE: $KOPS_STATE_STORE"
+          echo "VPC_ID: $VPC_ID"
+          echo "SUBNET_IDS: $SUBNET_IDS"
+
         working-directory: environments/dev
+
 
 
 
