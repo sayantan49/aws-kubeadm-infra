@@ -32,12 +32,18 @@ jobs:
       - name: Change directory to environments/dev
         run: cd environments/dev
 
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
 
       - name: Configure AWS Credentials
         run: |
           aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
           aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
           aws configure set region $AWS_REGION
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Initialize Terraform
         run: terraform init
@@ -53,12 +59,12 @@ jobs:
          # cat /tmp/tf_outputs.json
        # working-directory: environments/dev
 
-      - name: Fetch Terraform Outputs (Without jq)
+      - name: Fetch Terraform Outputs (Using jq)
         run: |
-            echo "Fetching Terraform Outputs..."
-            echo "KOPS_STATE_STORE=$(terraform output -raw kops_state_store)" >> $GITHUB_ENV
-            echo "VPC_ID=$(terraform output -raw vpc_id)" >> $GITHUB_ENV
-            echo "SUBNET_IDS=$(terraform output -json subnet_ids | tr -d '[:space:]')" >> $GITHUB_ENV
+          echo "Fetching Terraform Outputs..."
+          echo "KOPS_STATE_STORE=$(terraform output -json | jq -r '.kops_state_store.value')" >> $GITHUB_ENV
+          echo "VPC_ID=$(terraform output -json | jq -r '.vpc_id.value')" >> $GITHUB_ENV
+          echo "SUBNET_IDS=$(terraform output -json | jq -r '.subnet_ids.value | join(",")')" >> $GITHUB_ENV
         working-directory: environments/dev
 
       - name: Debug Output Variables
@@ -73,4 +79,3 @@ jobs:
 
       - name: Refresh Terraform State
         run: terraform apply -refresh-only -auto-approve
-        working-directory: environments/dev
