@@ -1,11 +1,18 @@
-variable "instance_type" {
-  description = "EC2 instance type"
+variable "vpc_id" {
+  description = "The VPC ID"
   type        = string
-  default     = "t3.medium"
+  default     = ""
 }
 
+variable "subnet_ids" {
+  description = "List of subnet IDs"
+  type        = list(string)
+  default     = []
+}
+
+
 variable "ami_id" {
-  description = "AMI ID for Ubuntu 22.04 in eu-north-1"
+  description = "Ubuntu AMI ID"
   type        = string
-  default     = "ami-046e1066fa018bc1a"
+  default     = "ami-09a9858973b288bdd"
 }

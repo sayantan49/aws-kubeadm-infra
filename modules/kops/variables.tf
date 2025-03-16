@@ -48,3 +48,6 @@ variable "master_size" {
   type        = string
   default     = "t3.medium"
 }
+
+
+

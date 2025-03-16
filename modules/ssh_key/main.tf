@@ -1,23 +1,20 @@
-resource "tls_private_key" "k8s_key" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
+variable "ssh_key_name" {
+  description = "SSH key pair name"
+  type        = string
+  default     = "my-k8s-key"
 }
 
-resource "local_file" "private_key" {
-  content  = tls_private_key.k8s_key.private_key_pem
-  filename = "~/.ssh/id_rsa"
+
+data "aws_key_pair" "existing_key" {
+  key_name = var.existing_key_name
 }
 
-resource "local_file" "public_key" {
-  content  = tls_private_key.k8s_key.public_key_openssh
-  filename = "~/.ssh/id_rsa.pub"
-}
-
-resource "aws_key_pair" "k8s_key" {
-  key_name   = "k8s-key"
-  public_key = tls_private_key.k8s_key.public_key_openssh
-}
+/*resource "aws_key_pair" "imported_key" {
+  key_name   = var.existing_key_name
+  public_key = file(var.local_key_path)
+}*/
 
 output "ssh_key_name" {
-  value = aws_key_pair.k8s_key.key_name
+  value = data.aws_key_pair.existing_key.key_name
 }
+

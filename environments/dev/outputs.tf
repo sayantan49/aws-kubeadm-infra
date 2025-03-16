@@ -1,29 +1,23 @@
 output "vpc_id" {
-  description = "VPC ID"
-  value       = module.vpc.vpc_id
+  value = module.vpc.vpc_id
 }
 
 output "subnet_ids" {
-  description = "List of subnet IDs"
-  value       = module.vpc.subnet_ids
+  value = module.vpc.subnet_ids
 }
 
 output "security_group_master_id" {
-  description = "Security Group ID for master node"
-  value       = module.security_groups.security_group_master_id
+  value = module.security_groups.master_id
 }
 
 output "security_group_worker_id" {
-  description = "Security Group ID for worker nodes"
-  value       = module.security_groups.security_group_worker_id
+  value = module.security_groups.worker_id
 }
 
-output "iam_role_name" {
-  description = "IAM Role for Kops"
-  value       = module.iam.iam_role_name
+output "ssh_key_name" {
+  value = module.ssh_key.ssh_key_name
 }
 
-output "s3_bucket_name" {
-  description = "S3 Bucket for Kops State Store"
-  value       = module.s3.bucket_name
-}
+#output "instance_ids" {
+  #value = module.ec2.instance_ids
+#}

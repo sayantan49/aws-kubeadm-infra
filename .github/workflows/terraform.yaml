@@ -47,9 +47,30 @@ jobs:
         run: terraform apply -auto-approve
         working-directory: environments/dev
 
-      - name: Fetch Terraform Outputs
-        run: |
-          terraform output -json > /tmp/tf_outputs.json
-          cat /tmp/tf_outputs.json
-        working-directory: environments/dev
+      #- name: Fetch Terraform Outputs
+        #run: |
+         # terraform output -json > /tmp/tf_outputs.json
+         # cat /tmp/tf_outputs.json
+       # working-directory: environments/dev
 
+      - name: Fetch Terraform Outputs (Without jq)
+        run: |
+          echo "Fetching Terraform Outputs..."
+          echo "KOPS_STATE_STORE=$(terraform output -raw kops_state_store)" >> $GITHUB_ENV
+          echo "VPC_ID=$(terraform output -raw vpc_id)" >> $GITHUB_ENV
+          echo "SUBNET_IDS=$(terraform output -raw subnet_ids)" >> $GITHUB_ENV
+
+      - name: Debug Output Variables
+        run: |
+          echo "KOPS_STATE_STORE: $KOPS_STATE_STORE"
+          echo "VPC_ID: $VPC_ID"
+          echo "SUBNET_IDS: $SUBNET_IDS"
+
+
+      - name: Deploy Kops Cluster
+        run: sh /scripts/deploy_kops.sh
+        working-directory: scripts/
+
+      - name: Refresh Terraform State
+        run: terraform refresh
+        working-directory: environments/dev
