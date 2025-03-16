@@ -10,6 +10,12 @@ variable "subnet_ids" {
   default     = []
 }
 
+variable "kops_state_bucket" {
+  description = "S3 bucket name for Kops state storage"
+  type        = string
+  default     = "kops-cluster-state-sayantan49"
+}
+
 
 variable "ami_id" {
   description = "Ubuntu AMI ID"

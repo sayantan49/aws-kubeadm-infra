@@ -21,3 +21,7 @@ output "ssh_key_name" {
 #output "instance_ids" {
   #value = module.ec2.instance_ids
 #}
+output "kops_state_store" {
+  description = "The S3 bucket used for Kops state storage"
+  value       = "s3://${var.kops_state_bucket}"
+}
