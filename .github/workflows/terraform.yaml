@@ -61,11 +61,12 @@ jobs:
 
       - name: Fetch Terraform Outputs (Using jq)
         run: |
-            echo "Fetching Terraform Outputs..."
-            echo "KOPS_STATE_STORE=$(terraform output -json | jq -r '.kops_state_store.value // empty')" >> $GITHUB_ENV
-            echo "VPC_ID=$(terraform output -json | jq -r '.vpc_id.value // empty')" >> $GITHUB_ENV
-            echo "SUBNET_IDS=$(terraform output -json | jq -r '.subnet_ids.value | join(",") // empty')" >> $GITHUB_ENV
+          echo "Fetching Terraform Outputs..."
+          echo "KOPS_STATE_STORE=$(terraform output -json | jq -r '.kops_state_store.value')" >> $GITHUB_ENV
+          echo "VPC_ID=$(terraform output -json | jq -r '.vpc_id.value')" >> $GITHUB_ENV
+          echo "SUBNET_IDS=$(terraform output -json | jq -c '.subnet_ids.value | join(",")')" >> $GITHUB_ENV
         working-directory: environments/dev
+
 
 
       - name: Debug Output Variables
